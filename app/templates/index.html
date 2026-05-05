@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MagnifiJSON</title>
+  <link rel="icon" type="image/svg+xml" href="/static/img/logo.svg" />
+  <link rel="stylesheet" href="/static/vendor/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- ── Upload drop overlay ──────────────────────────────── -->
+  <div id="drop-overlay" class="drop-overlay hidden">
+    <div class="drop-message">
+      <i class="bi bi-file-earmark-arrow-up"></i>
+      <span>Drop JSON file to upload</span>
+    </div>
+  </div>
+
+  <!-- ── Header ───────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-start">
+      <button class="icon-btn" id="sidebar-toggle" title="Toggle sidebar">
+        <i class="bi bi-layout-sidebar"></i>
+      </button>
+      <span class="app-logo">
+        <i class="bi bi-braces"></i>
+        <span class="app-name">MagnifiJSON</span>
+      </span>
+    </div>
+
+    <div class="header-center">
+      <div class="file-selector-wrap">
+        <i class="bi bi-file-earmark-code header-icon"></i>
+        <select id="file-selector" class="file-selector">
+          <option value="">— No file loaded —</option>
+        </select>
+      </div>
+      <div id="stats-strip" class="stats-strip hidden">
+        <span class="stat-item" id="stat-rows"><i class="bi bi-table"></i> <span>—</span></span>
+        <span class="stat-sep">·</span>
+        <span class="stat-item" id="stat-cols"><i class="bi bi-columns"></i> <span>—</span></span>
+        <span class="stat-sep">·</span>
+        <span class="stat-item" id="stat-shape"><i class="bi bi-diagram-3"></i> <span>—</span></span>
+        <span class="stat-sep">·</span>
+        <span class="stat-item" id="stat-size"><i class="bi bi-hdd"></i> <span>—</span></span>
+      </div>
+    </div>
+
+    <div class="header-end">
+      <button class="header-btn" id="upload-btn" title="Upload JSON file">
+        <i class="bi bi-cloud-upload"></i>
+        <span>Upload</span>
+      </button>
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme">
+        <i class="bi bi-moon-stars-fill"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main layout ──────────────────────────────────────── -->
+  <div class="app-layout" id="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span><i class="bi bi-folder2-open"></i> Files</span>
+        <button class="icon-btn sm" id="sidebar-upload-btn" title="Upload file">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+      </div>
+      <div id="file-list" class="file-list">
+        <div class="empty-state">
+          <i class="bi bi-file-earmark-x"></i>
+          <p>No files uploaded</p>
+          <button class="btn-primary sm" id="sidebar-upload-empty">Upload a file</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar resize handle -->
+    <div class="resize-handle-v" id="sidebar-resize"></div>
+
+    <!-- Content area -->
+    <main class="app-content" id="app-content">
+
+      <!-- Empty / welcome state -->
+      <div id="welcome-screen" class="welcome-screen">
+        <div class="welcome-card">
+          <i class="bi bi-braces-asterisk welcome-icon"></i>
+          <h2>MagnifiJSON</h2>
+          <p>Upload a JSON file to start exploring your data.</p>
+          <p class="welcome-sub">Supports flat arrays, nested objects, JSONL / NDJSON · SQL queries via DuckDB · Interactive charts · Export to CSV, JSON, SQL</p>
+          <button class="btn-primary lg" id="welcome-upload-btn">
+            <i class="bi bi-cloud-upload"></i> Upload JSON File
+          </button>
+          <div class="drop-hint">or drag & drop anywhere</div>
+        </div>
+      </div>
+
+      <!-- Tab container (shown when file loaded) -->
+      <div id="main-panel" class="main-panel hidden">
+
+        <!-- Tab bar -->
+        <div class="tab-bar" role="tablist">
+          <button class="tab-btn active" data-tab="table" role="tab">
+            <i class="bi bi-table"></i> Table
+          </button>
+          <button class="tab-btn" data-tab="tree" role="tab">
+            <i class="bi bi-diagram-3"></i> Tree
+          </button>
+          <button class="tab-btn" data-tab="sql" role="tab">
+            <i class="bi bi-terminal"></i> SQL
+          </button>
+          <button class="tab-btn" data-tab="graphs" role="tab">
+            <i class="bi bi-bar-chart-line"></i> Graphs
+          </button>
+          <button class="tab-btn" data-tab="exports" role="tab">
+            <i class="bi bi-box-arrow-up"></i> Exports
+          </button>
+        </div>
+
+        <!-- ── TABLE TAB ──────────────────────────────────── -->
+        <div class="tab-pane active" id="tab-table">
+          <div class="table-toolbar">
+            <div class="search-group">
+              <div class="search-input-wrap">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                  type="text"
+                  id="search-input"
+                  class="search-input"
+                  placeholder="Search rows…"
+                  autocomplete="off"
+                />
+                <button class="search-mode-btn" id="regex-toggle" title="Toggle regex mode">
+                  <span>.*</span>
+                </button>
+              </div>
+              <select id="search-col" class="col-select" title="Column to search">
+                <option value="">All columns</option>
+              </select>
+            </div>
+            <div class="toolbar-actions">
+              <button class="icon-btn sm" id="clear-search" title="Clear search">
+                <i class="bi bi-x-circle"></i>
+              </button>
+              <span class="result-count" id="result-count"></span>
+              <div class="col-vis-wrap">
+                <button class="icon-btn sm" id="col-vis-btn" title="Column visibility">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <div class="col-vis-panel hidden" id="col-vis-panel"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid area -->
+          <div class="grid-wrap" id="grid-wrap">
+            <div class="grid-loading hidden" id="grid-loading">
+              <div class="spinner"></div> Loading…
+            </div>
+            <div class="grid-scroller" id="grid-scroller">
+              <div class="grid-table" id="grid-table">
+                <div class="grid-head" id="grid-head"></div>
+                <div class="grid-body" id="grid-body"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-bar" id="pagination-bar">
+            <button class="icon-btn sm" id="first-btn" title="First page"><i class="bi bi-skip-start-fill"></i></button>
+            <button class="icon-btn sm" id="prev-btn" title="Previous page"><i class="bi bi-chevron-left"></i></button>
+            <span class="page-info" id="page-info">—</span>
+            <button class="icon-btn sm" id="next-btn" title="Next page"><i class="bi bi-chevron-right"></i></button>
+            <button class="icon-btn sm" id="last-btn" title="Last page"><i class="bi bi-skip-end-fill"></i></button>
+            <div class="page-size-wrap">
+              <label>Rows</label>
+              <select id="page-size">
+                <option value="25">25</option>
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row detail resize + panel -->
+          <div class="resize-handle-h" id="detail-resize"></div>
+          <div class="row-detail-panel" id="row-detail-panel">
+            <div class="detail-toolbar">
+              <span class="detail-title"><i class="bi bi-card-list"></i> Row Detail</span>
+              <div class="detail-actions">
+                <button class="detail-copy-btn" id="copy-json" title="Copy as JSON">
+                  <i class="bi bi-braces"></i> JSON
+                </button>
+                <button class="detail-copy-btn" id="copy-csv" title="Copy as CSV">
+                  <i class="bi bi-filetype-csv"></i> CSV
+                </button>
+                <button class="detail-copy-btn" id="copy-text" title="Copy as text">
+                  <i class="bi bi-clipboard"></i> Text
+                </button>
+                <span id="detail-copy-feedback" class="detail-copy-feedback" aria-live="polite"></span>
+              </div>
+            </div>
+            <div class="detail-body" id="detail-body">
+              <div class="detail-empty">Select a row to view details</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── TREE TAB ───────────────────────────────────── -->
+        <div class="tab-pane hidden" id="tab-tree">
+          <div class="tree-toolbar">
+            <button class="icon-btn sm" id="expand-all" title="Expand all">
+              <i class="bi bi-arrows-expand"></i> Expand All
+            </button>
+            <button class="icon-btn sm" id="collapse-all" title="Collapse all">
+              <i class="bi bi-arrows-collapse"></i> Collapse All
+            </button>
+            <div class="search-input-wrap sm">
+              <i class="bi bi-search search-icon"></i>
+              <input type="text" id="tree-search" class="search-input" placeholder="Search tree…" />
+            </div>
+          </div>
+          <div class="tree-container" id="tree-container">
+            <div class="detail-empty">Load a file to view its JSON tree</div>
+          </div>
+        </div>
+
+        <!-- ── SQL TAB ────────────────────────────────────── -->
+        <div class="tab-pane hidden" id="tab-sql">
+          <div class="sql-layout">
+            <div class="sql-editor-pane">
+              <div class="sql-editor-header">
+                <span class="pane-title"><i class="bi bi-terminal"></i> DuckDB SQL</span>
+                <span class="sql-hint" id="sql-view-hint"></span>
+                <div class="sql-editor-actions">
+                  <button class="header-btn" id="sql-execute" title="Ctrl+Enter">
+                    <i class="bi bi-play-fill"></i> Execute
+                  </button>
+                  <button class="icon-btn sm" id="sql-clear" title="Clear editor">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="sql-editor-wrap">
+                <pre id="sql-highlight" class="sql-highlight" aria-hidden="true"></pre>
+                <textarea
+                  id="sql-input"
+                  class="sql-editor"
+                  placeholder="SELECT * FROM &quot;your_file&quot; LIMIT 100"
+                  spellcheck="false"
+                ></textarea>
+                <div id="sql-autocomplete" class="sql-autocomplete hidden"></div>
+              </div>
+              <div class="sql-status-bar">
+                <span id="sql-status"></span>
+                <button class="save-query-btn" id="sql-save-btn">
+                  <i class="bi bi-bookmark-plus"></i> Save Query
+                </button>
+              </div>
+              <div class="sql-results-wrap" id="sql-results-wrap">
+                <div class="sql-results-toolbar hidden" id="sql-results-toolbar">
+                  <span id="sql-result-count"></span>
+                  <span class="truncated-badge hidden" id="sql-truncated">Results truncated</span>
+                  <button class="icon-btn sm" id="sql-export-btn" title="Export results">
+                    <i class="bi bi-download"></i> Export
+                  </button>
+                </div>
+                <div id="sql-results"></div>
+              </div>
+            </div>
+            <div class="sql-saved-pane">
+              <div class="sql-editor-header">
+                <span class="pane-title"><i class="bi bi-magic"></i> Query Builder</span>
+                <button class="icon-btn sm" id="sql-reset-sections" title="Reset panel sizes">
+                  <i class="bi bi-arrows-angle-contract"></i>
+                </button>
+              </div>
+              <div class="sql-builder-wrap resizable-block" id="sql-builder-wrap">
+                <div class="sql-builder-row two-col">
+                  <div>
+                    <label class="sql-builder-label" for="qb-column">Column</label>
+                    <select id="qb-column" class="col-select full"></select>
+                  </div>
+                  <div>
+                    <label class="sql-builder-label" for="qb-op">Operator</label>
+                    <select id="qb-op" class="col-select full">
+                      <option value="=">=</option>
+                      <option value="!=">!=</option>
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                      <option value=">=">&gt;=</option>
+                      <option value="<=">&lt;=</option>
+                      <option value="LIKE">LIKE</option>
+                      <option value="ILIKE">ILIKE</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="sql-builder-row">
+                  <label class="sql-builder-label" for="qb-value">Value</label>
+                  <input id="qb-value" class="col-select full" type="text" placeholder="e.g. 100 or text" />
+                </div>
+                <div class="sql-builder-row two-col">
+                  <div>
+                    <label class="sql-builder-label" for="qb-order-col">Order By</label>
+                    <select id="qb-order-col" class="col-select full"></select>
+                  </div>
+                  <div>
+                    <label class="sql-builder-label" for="qb-order-dir">Direction</label>
+                    <select id="qb-order-dir" class="col-select full">
+                      <option value="ASC">ASC</option>
+                      <option value="DESC">DESC</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="sql-builder-row two-col">
+                  <div>
+                    <label class="sql-builder-label" for="qb-limit">Limit</label>
+                    <input id="qb-limit" class="col-select full" type="number" min="1" max="10000" value="100" />
+                  </div>
+                  <div class="sql-builder-actions">
+                    <button class="saved-query-load" id="qb-build-btn">Build Query</button>
+                    <button class="saved-query-del" id="qb-add-filter-btn">Add Filter</button>
+                  </div>
+                </div>
+              </div>
+              <div class="sql-section-resize" data-target="sql-builder-wrap" title="Drag to resize section"></div>
+              <div class="sql-resize-hint">Drag to resize sections. Double-click a divider to reset that section.</div>
+
+              <div class="sql-editor-header">
+                <span class="pane-title"><i class="bi bi-table"></i> Available Tables</span>
+              </div>
+              <div id="sql-tables-list" class="sql-helper-list resizable-block">
+                <div class="detail-empty">No table loaded</div>
+              </div>
+              <div class="sql-section-resize" data-target="sql-tables-list" title="Drag to resize section"></div>
+
+              <div class="sql-side-grid">
+                <div class="sql-side-col">
+                  <div class="sql-editor-header">
+                    <span class="pane-title"><i class="bi bi-filter-square"></i> Available Columns</span>
+                  </div>
+                  <div class="sql-mini-search">
+                    <i class="bi bi-search"></i>
+                    <input id="sql-columns-search" type="text" placeholder="Search columns..." />
+                  </div>
+                  <div id="sql-columns-list" class="sql-helper-list large">
+                    <div class="detail-empty">Load a file to list columns</div>
+                  </div>
+                </div>
+                <div class="sql-side-col">
+                  <div class="sql-editor-header">
+                    <span class="pane-title"><i class="bi bi-bookmark-star"></i> Saved Queries</span>
+                  </div>
+                  <div class="sql-mini-search">
+                    <i class="bi bi-search"></i>
+                    <input id="saved-queries-search" type="text" placeholder="Search queries..." />
+                  </div>
+                  <div id="saved-queries-list" class="saved-queries-list resizable-block">
+                    <div class="detail-empty">No saved queries</div>
+                  </div>
+                  <div class="sql-section-resize" data-target="saved-queries-list" title="Drag to resize section"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save query dialog (inline) -->
+          <div class="save-dialog hidden" id="save-dialog">
+            <div class="save-dialog-inner">
+              <label>Query name</label>
+              <input type="text" id="save-query-name" placeholder="e.g. Top sales by region" />
+              <label>Description (optional)</label>
+              <input type="text" id="save-query-desc" placeholder="What does this query do?" />
+              <div class="save-dialog-actions">
+                <button class="btn-primary" id="save-query-confirm">Save</button>
+                <button class="btn-ghost" id="save-query-cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── GRAPHS TAB ─────────────────────────────────── -->
+        <div class="tab-pane hidden" id="tab-graphs">
+          <div class="graphs-layout">
+            <div class="graph-config-pane">
+              <div class="pane-title"><i class="bi bi-sliders"></i> Chart Configuration</div>
+
+              <div class="config-group">
+                <label>Chart Type</label>
+                <div class="chart-type-grid" id="chart-type-grid">
+                  <button class="chart-type-btn active" data-type="bar" title="Bar Chart">
+                    <i class="bi bi-bar-chart-fill"></i><span>Bar</span>
+                  </button>
+                  <button class="chart-type-btn" data-type="line" title="Line Chart">
+                    <i class="bi bi-graph-up"></i><span>Line</span>
+                  </button>
+                  <button class="chart-type-btn" data-type="pie" title="Pie Chart">
+                    <i class="bi bi-pie-chart-fill"></i><span>Pie</span>
+                  </button>
+                  <button class="chart-type-btn" data-type="scatter" title="Scatter Plot">
+                    <i class="bi bi-bezier2"></i><span>Scatter</span>
+                  </button>
+                  <button class="chart-type-btn" data-type="histogram" title="Histogram">
+                    <i class="bi bi-align-bottom"></i><span>Histogram</span>
+                  </button>
+                  <button class="chart-type-btn" data-type="radar" title="Radar Chart">
+                    <i class="bi bi-hexagon"></i><span>Radar</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="config-group">
+                <label for="x-col">X Axis / Category</label>
+                <select id="x-col" class="col-select full"></select>
+              </div>
+
+              <div class="config-group" id="y-col-group">
+                <label for="y-col">Y Axis / Value</label>
+                <select id="y-col" class="col-select full">
+                  <option value="">— Use COUNT —</option>
+                </select>
+              </div>
+
+              <div class="config-group" id="agg-group">
+                <label for="aggregation">Aggregation</label>
+                <select id="aggregation" class="col-select full">
+                  <option value="COUNT">COUNT</option>
+                  <option value="SUM">SUM</option>
+                  <option value="AVG">AVG</option>
+                  <option value="MIN">MIN</option>
+                  <option value="MAX">MAX</option>
+                  <option value="COUNT_DISTINCT">COUNT DISTINCT</option>
+                </select>
+              </div>
+
+              <div class="config-group">
+                <label for="chart-limit">Max Data Points</label>
+                <input type="number" id="chart-limit" class="col-select full" value="50" min="5" max="200" />
+              </div>
+
+              <div class="graph-actions">
+                <button class="btn-primary full" id="render-chart">
+                  <i class="bi bi-play-fill"></i> Render Chart
+                </button>
+                <button class="btn-ghost full" id="export-chart-png">
+                  <i class="bi bi-image"></i> Export PNG
+                </button>
+              </div>
+
+              <div class="config-group">
+                <div class="pane-title" style="margin-bottom:8px">
+                  <i class="bi bi-lightbulb"></i> Suggestions
+                </div>
+                <div id="chart-suggestions" class="chart-suggestions"></div>
+              </div>
+            </div>
+
+            <div class="graph-chart-pane">
+              <div id="chart-container" class="chart-container">
+                <div class="detail-empty">Configure and render a chart</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── EXPORTS TAB ────────────────────────────────── -->
+        <div class="tab-pane hidden" id="tab-exports">
+          <div class="exports-toolbar">
+            <span class="pane-title"><i class="bi bi-box-arrow-up"></i> Export Current File</span>
+            <div class="export-create-group">
+              <select id="export-format" class="col-select">
+                <option value="csv">CSV</option>
+                <option value="json">JSON</option>
+                <option value="sql">SQL INSERT</option>
+              </select>
+              <button class="btn-primary" id="create-export-btn">
+                <i class="bi bi-download"></i> Create Export
+              </button>
+            </div>
+          </div>
+          <div class="exports-list-wrap">
+            <div class="exports-list-header">
+              <span>Filename</span>
+              <span>Size</span>
+              <span>Modified</span>
+              <span>Actions</span>
+            </div>
+            <div id="exports-list" class="exports-list">
+              <div class="detail-empty">No exports yet</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /#main-panel -->
+    </main>
+  </div><!-- /.app-layout -->
+
+  <footer class="app-footer" aria-label="Application footer">
+    <div class="footer-center">MagnifiJSON</div>
+    <a class="footer-github" href="https://github.com/JonesCKevin" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+      <i class="bi bi-github" aria-hidden="true"></i>
+      <span>JonesCKevin</span>
+    </a>
+  </footer>
+
+  <!-- ── Context menu ──────────────────────────────────────── -->
+  <div id="context-menu" class="context-menu hidden">
+    <button class="ctx-item" id="ctx-copy-row"><i class="bi bi-clipboard"></i> Copy Row as JSON</button>
+    <button class="ctx-item" id="ctx-copy-csv"><i class="bi bi-filetype-csv"></i> Copy Row as CSV</button>
+    <div class="ctx-divider"></div>
+    <button class="ctx-item" id="ctx-filter-value"><i class="bi bi-funnel"></i> Filter by This Value</button>
+    <button class="ctx-item" id="ctx-open-tree"><i class="bi bi-diagram-3"></i> Show in Tree View</button>
+  </div>
+
+  <!-- ── Delete file modal ─────────────────────────────────── -->
+  <div class="modal-overlay hidden" id="delete-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <i class="bi bi-exclamation-triangle-fill" style="color:var(--danger)"></i>
+        Delete File
+      </div>
+      <div class="modal-body">
+        <p>Delete <strong id="delete-modal-name"></strong>?</p>
+        <p class="modal-sub">This will remove the file from disk and cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-danger" id="delete-confirm-btn">Delete</button>
+        <button class="btn-ghost" id="delete-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── File upload input (hidden) ───────────────────────── -->
+  <input type="file" id="file-input" accept=".json,.jsonl,.ndjson,.xml,.csv,.tsv,.psv,.xlsx,.xls,.sqlite,.sqlite3,.db" style="display:none" multiple />
+
+  <!-- ── Vendor scripts ────────────────────────────────────── -->
+  <script src="/static/vendor/bootstrap.bundle.min.js"></script>
+  <script src="/static/vendor/echarts.min.js"></script>
+
+  <!-- ── App modules ───────────────────────────────────────── -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/data-grid.js"></script>
+  <script src="/static/js/json-tree.js"></script>
+  <script src="/static/js/search.js"></script>
+  <script src="/static/js/row-detail.js"></script>
+  <script src="/static/js/context-menu.js"></script>
+  <script src="/static/js/file-manager.js"></script>
+  <script src="/static/js/sql-query.js"></script>
+  <script src="/static/js/graphs.js"></script>
+  <script src="/static/js/export.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>

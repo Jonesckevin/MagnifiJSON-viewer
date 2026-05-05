@@ -1,0 +1,6 @@
+desktop-app/
+exports/
+upload/
+__pycache__/
+
+.github/

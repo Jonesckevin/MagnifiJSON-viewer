@@ -1,0 +1,16 @@
+services:
+  magnijson:
+    build: .
+    container_name: magnijson-webui
+    ports:
+      - "9002:8080"
+    volumes:
+      - ./upload:/app/upload       # Persisted JSON file uploads
+      - ./exports:/app/exports     # Exports, saved queries, app state
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

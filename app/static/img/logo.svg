@@ -1,0 +1,19 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="120" height="120" fill="#0a0d1b"/>
+
+  <text x="26" y="62"
+     text-anchor="middle"
+     font-family="Segoe UI, system-ui, sans-serif"
+     dominant-baseline="middle"
+     font-size="106"
+     font-weight="600"
+     fill="#9b6cff">{</text>
+
+  <text x="94" y="62"
+     text-anchor="middle"
+     font-family="Segoe UI, system-ui, sans-serif"
+     dominant-baseline="middle"
+     font-size="106"
+     font-weight="600"
+     fill="#9b6cff">}</text>
+</svg>
