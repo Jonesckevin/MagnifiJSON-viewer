@@ -31,6 +31,13 @@ I was debating if I wanted SQLite or DuckDB for the query engine, but I went wit
 docker compose up --build
 ```
 
+### DockerHub
+
+```bash
+docker pull jonesckevin/magnifijson:latest
+docker run -it --rm -p 9002:8080 -v ./upload:/app/upload -v ./exports:/app/exports jonesckevin/magnifijson:latest
+```
+
 Open: http://localhost:9002
 
 ### WebUI (Local Python)
