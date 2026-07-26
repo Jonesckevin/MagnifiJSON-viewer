@@ -43,7 +43,7 @@ def get_chart_data(
 
     sx = _safe_col(x_col)
 
-    # ── Scatter (no aggregation) ─────────────────────────────
+    # ── Scatter (no aggregation) ──
     if chart_type == "scatter":
         sy = _safe_col(y_col) if y_col in col_names else sx
         sql = (
@@ -62,7 +62,7 @@ def get_chart_data(
             "title": f"{x_col} vs {y_col if y_col in col_names else x_col}",
         }
 
-    # ── Histogram (binned distribution) ─────────────────────
+    # ── Histogram (binned distribution) ──
     if chart_type == "histogram":
         target = y_col if y_col in col_names else x_col
         st = _safe_col(target)
@@ -94,7 +94,7 @@ def get_chart_data(
             "title": f"Distribution of {target}",
         }
 
-    # ── Bar / Line / Pie / Radar (GROUP BY aggregation) ─────
+    # ── Bar / Line / Pie / Radar (GROUP BY aggregation) ──
     if agg == "COUNT":
         agg_expr = "COUNT(*)"
         agg_label = "Count"

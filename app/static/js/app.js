@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  // ── App state ──────────────────────────────────────────────────
+  // ── App state ──
   let _activeFile = null;
   let _schema     = [];
   let _offset     = 0;
@@ -13,7 +13,7 @@
   let _activeTab  = 'table';
   let _sidebarCollapsed = false;
 
-  // ── Init ───────────────────────────────────────────────────────
+  // ── Init ──
   async function init() {
     // Load server state first
     let state = {};
@@ -97,7 +97,7 @@
     if (state.active_view) switchTab(state.active_view);
   }
 
-  // ── File loading ────────────────────────────────────────────────
+  // ── File loading ──
   async function loadFile(filename) {
     showLoading(true);
     try {
@@ -149,7 +149,7 @@
     showLoading(false);
   }
 
-  // ── Table rows ──────────────────────────────────────────────────
+  // ── Table rows ──
   async function loadRows(searchParams = {}) {
     if (!_activeFile) return;
     showGridLoading(true);
@@ -192,7 +192,7 @@
     showGridLoading(false);
   }
 
-  // ── Tree view ───────────────────────────────────────────────────
+  // ── Tree view ──
   async function loadTree() {
     if (!_activeFile) return;
     const container = document.getElementById('tree-container');
@@ -208,7 +208,7 @@
     }
   }
 
-  // ── Tabs ────────────────────────────────────────────────────────
+  // ── Tabs ──
   function _setupTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -239,7 +239,7 @@
     }).catch(() => {});
   }
 
-  // ── Upload ──────────────────────────────────────────────────────
+  // ── Upload ──
   function _setupUpload() {
     const fileInput = document.getElementById('file-input');
     const uploadBtns = [
@@ -277,7 +277,7 @@
     }
   }
 
-  // ── Drag & drop ─────────────────────────────────────────────────
+  // ── Drag & drop ──
   function _setupDragDrop() {
     const overlay = document.getElementById('drop-overlay');
     let dragCount = 0;
@@ -314,7 +314,7 @@
     });
   }
 
-  // ── Sidebar ──────────────────────────────────────────────────────
+  // ── Sidebar ──
   function _setupSidebar(state) {
     const sidebar = document.getElementById('sidebar');
     if (state.sidebar_width && sidebar) {
@@ -350,7 +350,7 @@
     });
   }
 
-  // ── Detail panel resize ───────────────────────────────────────────
+  // ── Detail panel resize ──
   function _setupDetailResize(state) {
     const handle  = document.getElementById('detail-resize');
     const panel   = document.getElementById('row-detail-panel');
@@ -382,7 +382,7 @@
     });
   }
 
-  // ── Pagination ────────────────────────────────────────────────────
+  // ── Pagination ──
   function _setupPagination() {
     document.getElementById('first-btn')?.addEventListener('click', () => { _offset = 0; loadRows(MagnifiSearch.getValue ? MagnifiSearch.getValue() : {}); });
     document.getElementById('prev-btn')?.addEventListener('click',  () => { _offset = Math.max(0, _offset - _limit); loadRows(MagnifiSearch.getValue ? MagnifiSearch.getValue() : {}); });
@@ -417,7 +417,7 @@
       : '';
   }
 
-  // ── Column visibility panel ────────────────────────────────────────
+  // ── Column visibility panel ──
   function _setupColVisPanel() {
     const btn   = document.getElementById('col-vis-btn');
     const panel = document.getElementById('col-vis-panel');
@@ -430,7 +430,7 @@
     panel?.addEventListener('click', e => e.stopPropagation());
   }
 
-  // ── Stats strip ────────────────────────────────────────────────────
+  // ── Stats strip ──
   function _updateStats(meta) {
     const strip = document.getElementById('stats-strip');
     if (strip) strip.classList.remove('hidden');
@@ -441,7 +441,7 @@
     set('stat-size',  _fmtSize(meta.size || 0));
   }
 
-  // ── Welcome / main panel ───────────────────────────────────────────
+  // ── Welcome / main panel ──
   function _showWelcome() {
     document.getElementById('welcome-screen')?.classList.remove('hidden');
     document.getElementById('main-panel')?.classList.add('hidden');
@@ -453,7 +453,7 @@
     document.getElementById('main-panel')?.classList.remove('hidden');
   }
 
-  // ── Loading states ──────────────────────────────────────────────────
+  // ── Loading states ──
   function showLoading(on) {
     // Could add a global spinner later
   }
@@ -462,7 +462,7 @@
     document.getElementById('grid-loading')?.classList.toggle('hidden', !on);
   }
 
-  // ── Toast ────────────────────────────────────────────────────────────
+  // ── Toast ──
   function toast(message, type = 'info') {
     const icons = { success: 'bi-check-circle-fill', error: 'bi-exclamation-circle-fill', info: 'bi-info-circle-fill' };
     const t = document.createElement('div');
@@ -490,9 +490,9 @@
     }).catch(() => {});
   }
 
-  // ── Public API ─────────────────────────────────────────────────────
+  // ── Public API ──
   window.MagnifiApp = { toast, saveColWidths, loadFile, switchTab };
 
-  // ── Boot ───────────────────────────────────────────────────────────
+  // ── Boot ──
   document.addEventListener('DOMContentLoaded', init);
 })();

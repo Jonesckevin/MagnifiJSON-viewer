@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  // ── State ─────────────────────────────────────────────────────
+  // ── State ──
   let _columns    = [];   // [{name, type}]
   let _rows       = [];   // [{}]
   let _colWidths  = {};   // {colName: widthPx}
@@ -18,10 +18,10 @@
 
   const DEFAULT_COL_W = 140;
 
-  // ── DOM helpers ───────────────────────────────────────────────
+  // ── DOM helpers ──
   const $ = id => document.getElementById(id);
 
-  // ── Render ────────────────────────────────────────────────────
+  // ── Render ──
   function render(columns, rows, opts = {}) {
     _columns = columns.map(c =>
       typeof c === 'string' ? { name: c, type: '' } : c
@@ -51,7 +51,7 @@
     return _colWidths[name] || DEFAULT_COL_W;
   }
 
-  // ── Header rendering ──────────────────────────────────────────
+  // ── Header rendering ──
   function _renderHeader() {
     const head = $('grid-head');
     if (!head) return;
@@ -93,7 +93,7 @@
     }
   }
 
-  // ── Body rendering ────────────────────────────────────────────
+  // ── Body rendering ──
   function _renderBody() {
     const body = $('grid-body');
     if (!body) return;
@@ -137,7 +137,7 @@
     return '';
   }
 
-  // ── Sort ──────────────────────────────────────────────────────
+  // ── Sort ──
   function _handleSortClick(colName) {
     if (_sortCol === colName) {
       _sortDir = _sortDir === 'ASC' ? 'DESC' : 'ASC';
@@ -149,7 +149,7 @@
     if (_onSort) _onSort(_sortCol, _sortDir);
   }
 
-  // ── Row selection ─────────────────────────────────────────────
+  // ── Row selection ──
   function _handleRowClick(e, idx) {
     if (e.ctrlKey || e.metaKey) {
       if (_selectedRows.has(idx)) _selectedRows.delete(idx);
@@ -189,7 +189,7 @@
     return [..._selectedRows].sort((a, b) => a - b).map(i => _rows[i]);
   }
 
-  // ── Column resize ─────────────────────────────────────────────
+  // ── Column resize ──
   function _startColResize(e, colName, headerCell) {
     e.preventDefault();
     e.stopPropagation();
@@ -225,7 +225,7 @@
     document.addEventListener('mouseup', onUp);
   }
 
-  // ── Column visibility ─────────────────────────────────────────
+  // ── Column visibility ──
   function setHiddenCols(set) {
     _hiddenCols = new Set(set);
     _renderHeader();
@@ -260,7 +260,7 @@
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
+  // ── Helpers ──
   function _esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }

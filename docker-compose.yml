@@ -3,11 +3,13 @@ services:
     build: .
     container_name: magnijson-webui
     ports:
-      - "9002:8080"
+      - "9021:8080"
     volumes:
       - ./upload:/app/upload       # Persisted JSON file uploads
       - ./exports:/app/exports     # Exports, saved queries, app state
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s

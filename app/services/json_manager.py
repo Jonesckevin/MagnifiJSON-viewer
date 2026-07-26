@@ -29,7 +29,7 @@ def _decode_text(raw: bytes) -> str:
     raise ValueError("Unable to decode file text")
 
 
-# ── JSON / JSONL parsing ──────────────────────────────────────
+# ── JSON / JSONL parsing ──
 
 def _parse_json_lines(raw: str) -> list[Any]:
     items: list[Any] = []
@@ -57,7 +57,7 @@ def _parse_uploaded_json(filename: str, raw: str) -> Any:
         raise
 
 
-# ── CSV / TSV / PSV parsing ───────────────────────────────────
+# ── CSV / TSV / PSV parsing ──
 
 def _csv_delimiter_for_suffix(suffix: str) -> str:
     if suffix == ".tsv":
@@ -92,7 +92,7 @@ def _parse_csv_content(filename: str, text: str) -> list[dict[str, Any]]:
     return rows
 
 
-# ── XML parsing ────────────────────────────────────────────────
+# ── XML parsing ──
 
 def _xml_local(tag: str) -> str:
     if "}" in tag:
@@ -139,7 +139,7 @@ def _parse_xml_content(text: str) -> Any:
     return [{_xml_local(root.tag): root_obj}]
 
 
-# ── Excel parsing ──────────────────────────────────────────────
+# ── Excel parsing ──
 
 def _clean_header(value: Any, idx: int) -> str:
     text = str(value).strip() if value is not None else ""
@@ -184,7 +184,7 @@ def _parse_xls(raw: bytes) -> list[dict[str, Any]]:
     return out
 
 
-# ── SQLite helpers ─────────────────────────────────────────────
+# ── SQLite helpers ──
 
 def _sqlite_tables(path: Path) -> list[str]:
     with sqlite3.connect(str(path)) as conn:
@@ -215,7 +215,7 @@ def _parse_uploaded_data(filename: str, raw: bytes) -> Any:
     raise ValueError(f"Unsupported extension: {suffix}")
 
 
-# ── Tabular normalization ──────────────────────────────────────
+# ── Tabular normalization ──
 
 def _flatten_record(record: dict, prefix: str = "") -> dict:
     out: dict[str, Any] = {}
@@ -244,7 +244,7 @@ def _normalize_for_tabular(data: Any) -> tuple[Any, bool]:
     return data, False
 
 
-# ── Shape detection ────────────────────────────────────────────
+# ── Shape detection ──
 
 def detect_shape(data: Any) -> str:
     if isinstance(data, list):
@@ -262,7 +262,7 @@ def detect_shape(data: Any) -> str:
     return "primitive"
 
 
-# ── Tree builder ───────────────────────────────────────────────
+# ── Tree builder ──
 
 def _build_tree(data: Any, max_depth: int = 10, depth: int = 0) -> Any:
     if depth >= max_depth:
@@ -284,7 +284,7 @@ def _build_tree(data: Any, max_depth: int = 10, depth: int = 0) -> Any:
     return data
 
 
-# ── Manual schema fallback ─────────────────────────────────────
+# ── Manual schema fallback ──
 
 def _manual_schema(data: Any, shape: str) -> list[dict]:
     if shape == "array_of_objects" and data:
@@ -302,7 +302,7 @@ def _register_hint_for_suffix(suffix: str) -> str:
     return "json"
 
 
-# ── Public API ────────────────────────────────────────────────
+# ── Public API ──
 
 def load_and_register(filename: str) -> dict:
     """Parse a supported file and register it with DuckDB. Returns metadata."""

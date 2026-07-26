@@ -4,14 +4,14 @@
 
   let _searchTerm = '';
 
-  // ── Public render ─────────────────────────────────────────────
+  // ── Public render ──
   function render(container, data) {
     container.innerHTML = '';
     const node = _buildNode(data, null, 0, true);
     container.appendChild(node);
   }
 
-  // ── Node factory ──────────────────────────────────────────────
+  // ── Node factory ──
   function _buildNode(value, key, depth, expanded) {
     const wrapper = document.createElement('div');
     wrapper.className = 'tree-node';
@@ -134,7 +134,7 @@
     return { cls: '', display: String(v) };
   }
 
-  // ── Search ────────────────────────────────────────────────────
+  // ── Search ──
   function search(term) {
     _searchTerm = term.trim().toLowerCase();
     const container = document.getElementById('tree-container');
@@ -166,7 +166,7 @@
     });
   }
 
-  // ── Expand / Collapse all ────────────────────────────────────
+  // ── Expand / Collapse all ──
   function expandAll() {
     const container = document.getElementById('tree-container');
     if (!container) return;
@@ -185,7 +185,7 @@
     });
   }
 
-  // ── Highlight search matches in displayed text ─────────────────
+  // ── Highlight search matches in displayed text ──
   function _highlight(html) {
     if (!_searchTerm) return html;
     const lower = html.toLowerCase();
@@ -198,7 +198,7 @@
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
+  // ── Helpers ──
   function _esc(s) {
     return String(s)
       .replace(/&/g, '&amp;')

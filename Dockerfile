@@ -45,6 +45,16 @@ COPY app/ .
 # Create runtime directories
 RUN mkdir -p /app/upload /app/exports
 
+# Non-root user — uvicorn does not need root
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -m -s /sbin/nologin appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/', timeout=3).status < 500 else 1)" || exit 1
+
 EXPOSE 8080
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1", "--loop", "asyncio"]

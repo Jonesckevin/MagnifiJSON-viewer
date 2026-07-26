@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- ── Upload drop overlay ──────────────────────────────── -->
+  <!-- ── Upload drop overlay ── -->
   <div id="drop-overlay" class="drop-overlay hidden">
     <div class="drop-message">
       <i class="bi bi-file-earmark-arrow-up"></i>
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <!-- ── Header ───────────────────────────────────────────── -->
+  <!-- ── Header ── -->
   <header class="app-header">
     <div class="header-start">
       <button class="icon-btn" id="sidebar-toggle" title="Toggle sidebar">
@@ -60,7 +60,7 @@
     </div>
   </header>
 
-  <!-- ── Main layout ──────────────────────────────────────── -->
+  <!-- ── Main layout ── -->
   <div class="app-layout" id="app-layout">
 
     <!-- Sidebar -->
@@ -122,7 +122,7 @@
           </button>
         </div>
 
-        <!-- ── TABLE TAB ──────────────────────────────────── -->
+        <!-- ── TABLE TAB ── -->
         <div class="tab-pane active" id="tab-table">
           <div class="table-toolbar">
             <div class="search-group">
@@ -213,7 +213,7 @@
           </div>
         </div>
 
-        <!-- ── TREE TAB ───────────────────────────────────── -->
+        <!-- ── TREE TAB ── -->
         <div class="tab-pane hidden" id="tab-tree">
           <div class="tree-toolbar">
             <button class="icon-btn sm" id="expand-all" title="Expand all">
@@ -232,7 +232,7 @@
           </div>
         </div>
 
-        <!-- ── SQL TAB ────────────────────────────────────── -->
+        <!-- ── SQL TAB ── -->
         <div class="tab-pane hidden" id="tab-sql">
           <div class="sql-layout">
             <div class="sql-editor-pane">
@@ -386,7 +386,7 @@
           </div>
         </div>
 
-        <!-- ── GRAPHS TAB ─────────────────────────────────── -->
+        <!-- ── GRAPHS TAB ── -->
         <div class="tab-pane hidden" id="tab-graphs">
           <div class="graphs-layout">
             <div class="graph-config-pane">
@@ -470,7 +470,7 @@
           </div>
         </div>
 
-        <!-- ── EXPORTS TAB ────────────────────────────────── -->
+        <!-- ── EXPORTS TAB ── -->
         <div class="tab-pane hidden" id="tab-exports">
           <div class="exports-toolbar">
             <span class="pane-title"><i class="bi bi-box-arrow-up"></i> Export Current File</span>
@@ -510,7 +510,7 @@
     </a>
   </footer>
 
-  <!-- ── Context menu ──────────────────────────────────────── -->
+  <!-- ── Context menu ── -->
   <div id="context-menu" class="context-menu hidden">
     <button class="ctx-item" id="ctx-copy-row"><i class="bi bi-clipboard"></i> Copy Row as JSON</button>
     <button class="ctx-item" id="ctx-copy-csv"><i class="bi bi-filetype-csv"></i> Copy Row as CSV</button>
@@ -519,7 +519,7 @@
     <button class="ctx-item" id="ctx-open-tree"><i class="bi bi-diagram-3"></i> Show in Tree View</button>
   </div>
 
-  <!-- ── Delete file modal ─────────────────────────────────── -->
+  <!-- ── Delete file modal ── -->
   <div class="modal-overlay hidden" id="delete-modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -537,14 +537,14 @@
     </div>
   </div>
 
-  <!-- ── File upload input (hidden) ───────────────────────── -->
+  <!-- ── File upload input (hidden) ── -->
   <input type="file" id="file-input" accept=".json,.jsonl,.ndjson,.xml,.csv,.tsv,.psv,.xlsx,.xls,.sqlite,.sqlite3,.db" style="display:none" multiple />
 
-  <!-- ── Vendor scripts ────────────────────────────────────── -->
+  <!-- ── Vendor scripts ── -->
   <script src="/static/vendor/bootstrap.bundle.min.js"></script>
   <script src="/static/vendor/echarts.min.js"></script>
 
-  <!-- ── App modules ───────────────────────────────────────── -->
+  <!-- ── App modules ── -->
   <script src="/static/js/theme.js"></script>
   <script src="/static/js/data-grid.js"></script>
   <script src="/static/js/json-tree.js"></script>

@@ -43,7 +43,7 @@ class _DuckEngine:
         except Exception:
             pass
 
-    # ── View management ─────────────────────────────────────────
+    # ── View management ──
 
     def register(
         self,
@@ -121,7 +121,7 @@ class _DuckEngine:
     def list_views(self) -> list[str]:
         return list(self._views.keys())
 
-    # ── Schema ──────────────────────────────────────────────────
+    # ── Schema ──
 
     def describe(self, view_name: str) -> list[dict]:
         """Return column names and DuckDB types for a view."""
@@ -140,7 +140,7 @@ class _DuckEngine:
             except Exception:
                 return 0
 
-    # ── Query ───────────────────────────────────────────────────
+    # ── Query ──
 
     def execute(self, sql: str, params: Optional[list] = None) -> list[dict]:
         """Execute SQL and return list of dicts."""
@@ -155,7 +155,7 @@ class _DuckEngine:
             except duckdb.Error as exc:
                 raise RuntimeError(str(exc)) from exc
 
-    # ── SQL Validation ──────────────────────────────────────────
+    # ── SQL Validation ──
 
     def validate_sql(self, sql: str) -> str:
         """Ensure SQL is read-only. Returns cleaned SQL or raises ValueError."""

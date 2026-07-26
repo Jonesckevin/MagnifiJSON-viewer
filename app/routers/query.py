@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/query", tags=["query"])
 SAVED_QUERIES_FILE = Path("/app/exports/saved_queries.json")
 
 
-# ── Saved query helpers ──────────────────────────────────────────
+# ── Saved query helpers ──
 
 def _load_saved() -> list:
     if not SAVED_QUERIES_FILE.exists():
@@ -62,7 +62,7 @@ def _save_all(queries: list):
     SAVED_QUERIES_FILE.write_text(json.dumps(queries, indent=2), encoding="utf-8")
 
 
-# ── Row serializer ───────────────────────────────────────────────
+# ── Row serializer ──
 
 def _serialize_row(row: dict) -> dict:
     out = {}
@@ -76,7 +76,7 @@ def _serialize_row(row: dict) -> dict:
     return out
 
 
-# ── Models ───────────────────────────────────────────────────────
+# ── Models ──
 
 class ExecuteRequest(BaseModel):
     sql: str
@@ -93,7 +93,7 @@ class SaveQueryRequest(BaseModel):
     description: Optional[str] = ""
 
 
-# ── Endpoints ────────────────────────────────────────────────────
+# ── Endpoints ──
 
 @router.post("/execute")
 def execute_sql(req: ExecuteRequest):

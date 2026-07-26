@@ -76,13 +76,13 @@ def get_rows(
     if sort_col and sort_col not in col_names:
         sort_col = None
 
-    # ── ORDER BY clause ──────────────────────────────────────
+    # ── ORDER BY clause ──
     order_clause = ""
     if sort_col:
         sc = f'"{sort_col.replace(chr(34), chr(34) * 2)}"'
         order_clause = f" ORDER BY {sc} {sort_dir}"
 
-    # ── Regex search: fetch all, filter in Python ────────────
+    # ── Regex search: fetch all, filter in Python ──
     if regex and search:
         try:
             pattern = re.compile(search, re.IGNORECASE)
@@ -117,7 +117,7 @@ def get_rows(
             "limit": limit,
         }
 
-    # ── String / no search: parameterised SQL ────────────────
+    # ── String / no search: parameterised SQL ──
     where_clause = ""
     params: list = []
 
